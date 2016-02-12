@@ -1,6 +1,6 @@
 # .bashrc
 
-# Source global definitions
+#Source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
@@ -19,12 +19,12 @@ fi
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Load mtime at bash start-up
-echo "bashrc mtime: $(stat -c "%Y" ~/.reload_bashrc)" >&2
-export BASHRC_MTIME=$(stat -c "%Y" ~/.reload_bashrc)
+echo "bashrc mtime $(stat -f "%a" ~/.reload_bashrc)" >&2
+export BASHRC_MTIME=$(stat -f "%a" ~/.reload_bashrc)
 
 check_and_reload_bashrc() {
-  if [ "$(stat -c "%Y" ~/.reload_bashrc)" != $BASHRC_MTIME ]; then
-    export BASHRC_MTIME="$(stat -c "%Y" ~/.reload_bashrc)"
+  if [ `stat -f "%a" ~/.reload_bashrc` != $BASHRC_MTIME ]; then
+    export BASHRC_MTIME="$(stat -f "%a" ~/.reload_bashrc)"
     echo "bashrc changed. re-sourcing..." >&2
     source ~/.bashrc
   fi
@@ -35,12 +35,13 @@ rbash() {
 }
 
 isAlias() {
-    type $1 | grep -iq alias
+    type $1 | grep -iq alias | wc -l
 }
 
-if isAlias "setcs"; then
-    unalias setcs
-fi 
+#echo "Here"
+#if [ isAlias(setcs) ]; then
+#    unalias setcs
+#fi
 
 setcs() {
     find . -regex '.*\.\(c\|cpp\|h\)$' -print > cscope.files
@@ -52,4 +53,5 @@ setcs() {
 
 PROMPT_COMMAND="check_and_reload_bashrc"
 alias csr="cscope -d"
-export PYTHONSTARTUP=~/.pythonrc
+[ -f ~/.pythonrc ] && export PYTHONSTARTUP=~/.pythonrc
+export PS1='> '
